@@ -1,6 +1,8 @@
+clear
 /* 1. What should be written in the command line to create an “age” variable with represents the age of a person in years? */
 generate int age = 1
 /* 2. What should be written in the command line to rename the variable “q1” to “gender”? */
+gen int q1 = 2 
 rename q1 gender
 /* 3. What should be written in the command line to give to the “age” variable the label “Age in years”? */
 label variable age "Age in years"
@@ -137,3 +139,22 @@ tabstat age, statistics(iqr)
 /* Quartile deviation: 6/2=3 */
 /* Decile ratio: p90/p10 = 44/35 = 1.257  */
 
+// Crate a histogram for age variable with normal density plot and copy it into this file.
+hist age
+
+// e. Indicate the mean age for those who are married and not married.
+mean age if married == 1
+// Mean estimation                   Number of obs   =      1,442
+
+// --------------------------------------------------------------
+//              |       Mean   Std. Err.     [95% Conf. Interval]
+// -------------+------------------------------------------------
+//          age |    39.1165   .0807417      38.95812    39.27489
+// --------------------------------------------------------------
+mean age if married == 0
+// Mean estimation                   Number of obs   =        804
+// --------------------------------------------------------------
+//              |       Mean   Std. Err.     [95% Conf. Interval]
+// -------------+------------------------------------------------
+//          age |   39.21891   .1075621      39.00777    39.43004
+// --------------------------------------------------------------
