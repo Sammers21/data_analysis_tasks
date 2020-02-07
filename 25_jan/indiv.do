@@ -142,7 +142,8 @@ tabstat age, statistics(iqr)
 // Crate a histogram for age variable with normal density plot and copy it into this file.
 hist age
 
-// e. Indicate the mean age for those who are married and not married.
+// d. Indicate the mean age for those who
+// are married and not married.
 mean age if married == 1
 // Mean estimation                   Number of obs   =      1,442
 
@@ -155,9 +156,34 @@ mean age if married == 0
 // Mean estimation                   Number of obs   =        804
 // --------------------------------------------------------------
 //              |       Mean   Std. Err.     [95% Conf. Interval]
-// -------------+------------------------------------------------
+// -------------+------------------x------------------------------
 //          age |   39.21891   .1075621      39.00777    39.43004
 // --------------------------------------------------------------
-mean age if married == 0
-mean age if married == 0
-mean age if married == 0
+// e, Indicate the maximum age of those who are not married and have the tenure variable greater than 50. 
+// Answer: No such people
+summarize tenure
+// How many college graduates are married:
+// Answer: 344
+// what is the percent of college graduates that are married?
+// Answer:  344/532 = 0.6466...
+drop if collgrad == 0
+// (1,714 observations deleted)
+count if married == 1
+//  344
+count
+// 532
+// g. How many research participants have the following characteristics:
+// - are not married,
+// Answer: 804
+clear
+sysuse nlsw88.dta
+count if married == 0
+// - are not college graduates,
+// Answer: 1714
+count if collgrad == 0
+//  are not members of the union. 
+// Answer: 1,630
+drop if married == 0 & collgrad == 0
+count
+mean age
+exit
