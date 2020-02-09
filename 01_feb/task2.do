@@ -19,8 +19,6 @@ use data_games.dta, clear
 describe
 drop if payment < 100 | payment > 14000
 tab payment
-recode payment (100/500 = 1 "1st group") (501/1000 = 2 "2nd group") (1001/2000 = 3 "3rd group") (2000/max = 4 "4rd group" ), gen(payment_groups)
-// generate tax = .
-// replace tax = (salary / dollor_rub_ratio) * 0.13 if foreigner == 0
-tabulate payment_groups
+recode payment (100/500 = 1 "1st group") (501/1000 = 2 "2nd group") (1001/2000 = 3 "3rd group") (2000/max = 4 "4rd group" ), gen(payment_group)
+tab payment_group
 exit

@@ -1069,12 +1069,10 @@ Sorted by:
       Total |    103,805      100.00
 
 . recode payment (100/500 = 1 "1st group") (501/1000 = 2 "2nd group") (1001/200
-> 0 = 3 "3rd group") (2000/max = 4 "4rd group" ), gen(payment_groups)
-(103805 differences between payment and payment_groups)
+> 0 = 3 "3rd group") (2000/max = 4 "4rd group" ), gen(payment_group)
+(103805 differences between payment and payment_group)
 
-. // generate tax = .
-. // replace tax = (salary / dollor_rub_ratio) * 0.13 if foreigner == 0
-. tabulate payment_groups
+. tab payment_group
 
   RECODE of |
     payment |
