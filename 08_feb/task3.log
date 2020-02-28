@@ -1,0 +1,229 @@
+
+. //  1.x
+. use data_games.dta, clear
+
+. describe
+
+Contains data from data_games.dta
+  obs:       105,507                          
+ vars:             9                          24 Jan 2020 15:56
+ size:     7,174,476                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+id              double  %10.0g                ID
+pack_id         double  %10.0g                pack_id
+crystalls_bal~y double  %10.0g                crystalls_balance_before_buy
+crystalls_bou~t double  %10.0g                crystalls_bought
+country         str4    %4s                   country
+payment         double  %10.0g                payment in cents
+utc_timestamp   double  %10.0g                
+payment_type    double  %10.0g     payment_type_rec
+                                              payment_type
+payment_method  double  %10.0g     payment_method_rec
+                                              payment_method
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. tabulate payment_method payment_type, chi2
+
+payment_meth |     payment_type
+          od |     offer    regular |     Total
+-------------+----------------------+----------
+fb_promotion |         0        498 |       498 
+     general |    13,538     89,740 |   103,278 
+    giftcard |         0         58 |        58 
+      mobile |       301      1,372 |     1,673 
+-------------+----------------------+----------
+       Total |    13,839     91,668 |   105,507 
+
+          Pearson chi2(3) = 118.8332   Pr = 0.000
+
+. graph bar (percent), over(payment_type) over(payment_method) nofill 
+
+. // 2.x
+. twoway scatter crystalls_balance_before_buy payment
+
+. egen payment_mu = mean(payment)
+
+. egen payment_s = sd(payment)
+
+. ksmirnov payment = normprob((payment-payment_mu)/payment_s)
+
+One-sample Kolmogorov-Smirnov test against theoretical distribution
+           normprob((payment-payment_mu)/payment_s)
+
+ Smaller group       D       P-value  
+ -----------------------------------
+ payment:            0.2527    0.000
+ Cumulative:        -0.2033    0.000
+ Combined K-S:       0.2527    0.000
+
+Note: Ties exist in dataset; 
+      there are 567 unique values out of 105507 observations.
+
+. swilk payment
+
+                   Shapiro-Wilk W test for normal data
+
+    Variable |        Obs       W           V         z       Prob>z
+-------------+------------------------------------------------------
+     payment |    105,507    0.68626   9944.920    25.814    0.00000
+
+. pwcorr crystalls_balance_before_buy payment
+
+             | crysta~y  payment
+-------------+------------------
+crystalls_~y |   1.0000 
+     payment |   0.0565   1.0000 
+
+. pwcorr crystalls_balance_before_buy crystalls_bought
+
+             | crysta~y crysta~t
+-------------+------------------
+crystalls_~y |   1.0000 
+crystalls_~t |   0.1140   1.0000 
+
+. pwcorr payment crystalls_bought
+
+             |  payment crysta~t
+-------------+------------------
+     payment |   1.0000 
+crystalls_~t |   0.8511   1.0000 
+
+. // 3.x
+. use health_funding.dta, clear
+
+. describe
+
+Contains data from health_funding.dta
+  obs:            50                          
+ vars:             4                          
+ size:         1,600                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+funding         double  %10.0g                Health care funding (amount per
+                                                100)
+disease         double  %10.0g                Reported diseases (rate per
+                                                10,000)
+visits          double  %10.0g                Visits to health care providers
+                                                (rate per 10,000)
+citycode        double  %10.0g                
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. pwcorr funding disease , sig
+
+             |  funding  disease
+-------------+------------------
+     funding |   1.0000 
+             |
+             |
+     disease |   0.7371   1.0000 
+             |   0.0000
+             |
+
+. pcorr funding disease visits
+(obs=50)
+
+Partial and semipartial correlations of funding with
+
+               Partial   Semipartial      Partial   Semipartial   Significance
+   Variable |    Corr.         Corr.      Corr.^2       Corr.^2          Value
+------------+-----------------------------------------------------------------
+    disease |   0.0133        0.0035       0.0002        0.0000         0.9275
+     visits |   0.9201        0.6218       0.8467        0.3867         0.0000
+
+. // 4.x
+. use auto.dta, clear
+(1978 Automobile Data)
+
+. describe
+
+Contains data from auto.dta
+  obs:            74                          1978 Automobile Data
+ vars:            12                          13 Apr 2005 17:45
+ size:         3,182                          (_dta has notes)
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+make            str18   %-18s                 Make and Model
+price           int     %8.0gc                Price
+mpg             int     %8.0g                 Mileage (mpg)
+rep78           int     %8.0g                 Repair Record 1978
+headroom        float   %6.1f                 Headroom (in.)
+trunk           int     %8.0g                 Trunk space (cu. ft.)
+weight          int     %8.0gc                Weight (lbs.)
+length          int     %8.0g                 Length (in.)
+turn            int     %8.0g                 Turn Circle (ft.)
+displacement    int     %8.0g                 Displacement (cu. in.)
+gear_ratio      float   %6.2f                 Gear Ratio
+foreign         byte    %8.0g      origin     Car type
+-------------------------------------------------------------------------------
+Sorted by: foreign
+
+. ttest length, by(foreign)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. Err.   Std. Dev.   [95% Conf. Interval]
+---------+--------------------------------------------------------------------
+Domestic |      52    196.1346    2.779887    20.04605    190.5538    201.7155
+ Foreign |      22    168.5455    2.917129    13.68255     162.479     174.612
+---------+--------------------------------------------------------------------
+combined |      74    187.9324    2.588409    22.26634    182.7737    193.0911
+---------+--------------------------------------------------------------------
+    diff |            27.58916    4.684448                18.25088    36.92744
+------------------------------------------------------------------------------
+    diff = mean(Domestic) - mean(Foreign)                         t =   5.8895
+Ho: diff = 0                                     degrees of freedom =       72
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 1.0000         Pr(|T| > |t|) = 0.0000          Pr(T > t) = 0.0000
+
+. use data_games.dta, clear 
+
+. ttest payment, by(payment_type)
+
+Two-sample t test with equal variances
+------------------------------------------------------------------------------
+   Group |     Obs        Mean    Std. Err.   Std. Dev.   [95% Conf. Interval]
+---------+--------------------------------------------------------------------
+   offer |  13,839    1231.117    11.77169    1384.814    1208.043    1254.191
+ regular |  91,668    1193.722    4.671583    1414.402    1184.566    1202.878
+---------+--------------------------------------------------------------------
+combined | 105,507    1198.627    4.342755    1410.607    1190.115    1207.139
+---------+--------------------------------------------------------------------
+    diff |            37.39485    12.86382                12.18193    62.60777
+------------------------------------------------------------------------------
+    diff = mean(offer) - mean(regular)                            t =   2.9070
+Ho: diff = 0                                     degrees of freedom =   105505
+
+    Ha: diff < 0                 Ha: diff != 0                 Ha: diff > 0
+ Pr(T < t) = 0.9982         Pr(|T| > |t|) = 0.0037          Pr(T > t) = 0.0018
+
+. kwallis payment, by(payment_method)
+
+Kruskal-Wallis equality-of-populations rank test
+
+  +---------------------------------+
+  | payment_~d |     Obs | Rank Sum |
+  |------------+---------+----------|
+  | fb_promoti |     498 | 1.13e+07 |
+  |    general | 103,278 | 5.51e+09 |
+  |   giftcard |      58 |  1711.00 |
+  |     mobile |   1,673 | 4.93e+07 |
+  +---------------------------------+
+
+chi-squared =  1667.626 with 3 d.f.
+probability =     0.0001
+
+chi-squared with ties =  1681.048 with 3 d.f.
+probability =     0.0001
+
+. 
+end of do-file
