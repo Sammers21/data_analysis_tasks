@@ -1,0 +1,126 @@
+
+. use "WARRANTY.dta", clear
+
+. logit Bought Gender Gift Age Race Price100
+
+Iteration 0:   log likelihood = -29.647666  
+Iteration 1:   log likelihood = -15.850953  
+Iteration 2:   log likelihood = -12.251799  
+Iteration 3:   log likelihood = -10.256114  
+Iteration 4:   log likelihood = -9.9736779  
+Iteration 5:   log likelihood = -9.9714306  
+Iteration 6:   log likelihood = -9.9714303  
+
+Logistic regression                             Number of obs     =         50
+                                                LR chi2(5)        =      39.35
+                                                Prob > chi2       =     0.0000
+Log likelihood = -9.9714303                     Pseudo R2         =     0.6637
+
+------------------------------------------------------------------------------
+      Bought |      Coef.   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      Gender |   -2.20201   1.768822    -1.24   0.213    -5.668837    1.264817
+        Gift |   2.848165   1.301409     2.19   0.029     .2974491     5.39888
+         Age |   .0926411   .0442661     2.09   0.036      .005881    .1794011
+        Race |   .5782489   .6439617     0.90   0.369    -.6838929    1.840391
+    Price100 |   .0550196   .0239029     2.30   0.021     .0081707    .1018685
+       _cons |  -8.442717   3.516437    -2.40   0.016    -15.33481   -1.550627
+------------------------------------------------------------------------------
+Note: 0 failures and 4 successes completely determined.
+
+. estat gof
+
+Logistic model for Bought, goodness-of-fit test
+-----------------------------------------------
+
+       number of observations =        50
+ number of covariate patterns =        50
+             Pearson chi2(44) =        28.45
+                  Prob > chi2 =         0.9666
+
+. logistic Bought Gender Gift Age Race Price100
+
+Logistic regression                             Number of obs     =         50
+                                                LR chi2(5)        =      39.35
+                                                Prob > chi2       =     0.0000
+Log likelihood = -9.9714303                     Pseudo R2         =     0.6637
+
+------------------------------------------------------------------------------
+      Bought | Odds Ratio   Std. Err.      z    P>|z|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+      Gender |   .1105807   .1955976    -1.24   0.213     .0034519    3.542445
+        Gift |   17.25608   22.45723     2.19   0.029      1.34642    221.1586
+         Age |   1.097068    .048563     2.09   0.036     1.005898    1.196501
+        Race |   1.782914   1.148128     0.90   0.369     .5046486    6.298998
+    Price100 |   1.056561   .0252549     2.30   0.021     1.008204    1.107238
+       _cons |   .0002155   .0007577    -2.40   0.016     2.19e-07    .2121149
+------------------------------------------------------------------------------
+Note: 0 failures and 4 successes completely determined.
+
+. tab Gender
+
+ Customer’s |
+     gender |      Freq.     Percent        Cum.
+------------+-----------------------------------
+     Female |         14       28.00       28.00
+       Male |         36       72.00      100.00
+------------+-----------------------------------
+      Total |         50      100.00
+
+. tab Race
+
+ Customer’s race |      Freq.     Percent        Cum.
+-----------------+-----------------------------------
+           White |         16       32.00       32.00
+African American |         12       24.00       56.00
+        Hispanic |         15       30.00       86.00
+           Other |          7       14.00      100.00
+-----------------+-----------------------------------
+           Total |         50      100.00
+
+. predict predict_percent
+(option pr assumed; Pr(Bought))
+
+. recode predict_percent (0/0.5=0) (0.5/1=1), gen(predict_final)
+(46 differences between predict_percent and predict_final)
+
+. compare predict_final Bought
+
+                                        ---------- difference ----------
+                            count       minimum      average     maximum
+------------------------------------------------------------------------
+predict~l<Bought                1            -1           -1          -1
+predict~l=Bought               47
+predict~l>Bought                2             1            1           1
+                       ----------
+jointly defined                50            -1          .02           1
+                       ----------
+total                          50
+
+. 
+. predict r, resid
+
+. egen r_mu = mean(r)
+
+. egen r_s = sd(r)
+
+. ksmirnov r = normprob((r-r_mu)/r_s)
+
+One-sample Kolmogorov-Smirnov test against theoretical distribution
+           normprob((r-r_mu)/r_s)
+
+ Smaller group       D       P-value  
+ -----------------------------------
+ r:                  0.2068    0.014
+ Cumulative:        -0.2073    0.014
+ Combined K-S:       0.2073    0.027
+
+. tabstat r, stats(range)
+
+    variable |     range
+-------------+----------
+           r |  6.443224
+------------------------
+
+. 
+end of do-file
