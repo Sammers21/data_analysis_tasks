@@ -1,0 +1,96 @@
+
+. use data_games.dta, clear
+
+. describe
+
+Contains data from data_games.dta
+  obs:       105,507                          
+ vars:             9                          24 Jan 2020 15:56
+ size:     7,174,476                          
+-------------------------------------------------------------------------------
+              storage   display    value
+variable name   type    format     label      variable label
+-------------------------------------------------------------------------------
+id              double  %10.0g                ID
+pack_id         double  %10.0g                pack_id
+crystalls_bal~y double  %10.0g                crystalls_balance_before_buy
+crystalls_bou~t double  %10.0g                crystalls_bought
+country         str4    %4s                   country
+payment         double  %10.0g                payment in cents
+utc_timestamp   double  %10.0g                
+payment_type    double  %10.0g     payment_type_rec
+                                              payment_type
+payment_method  double  %10.0g     payment_method_rec
+                                              payment_method
+-------------------------------------------------------------------------------
+Sorted by: 
+
+. reg payment payment_type payment_method crystalls_balance_before_buy crystall
+> s_bought
+
+      Source |       SS           df       MS      Number of obs   =   105,507
+-------------+----------------------------------   F(4, 105502)    =  74133.06
+       Model |  1.5485e+11         4  3.8711e+10   Prob > F        =    0.0000
+    Residual |  5.5092e+10   105,502  522186.928   R-squared       =    0.7376
+-------------+----------------------------------   Adj R-squared   =    0.7376
+       Total |  2.0994e+11   105,506  1989811.22   Root MSE        =    722.63
+
+------------------------------------------------------------------------------
+     payment |      Coef.   Std. Err.      t    P>|t|     [95% Conf. Interval]
+-------------+----------------------------------------------------------------
+payment_type |   392.0782   6.642137    59.03   0.000     379.0597    405.0967
+payment_me~d |  -274.6761   8.537848   -32.17   0.000    -291.4102   -257.9421
+crystalls_~y |  -.6054904   .0242733   -24.94   0.000    -.6530656   -.5579151
+crystalls_~t |   16.18135   .0298283   542.48   0.000     16.12289    16.23981
+       _cons |   198.6115   21.80964     9.11   0.000     155.8649     241.358
+------------------------------------------------------------------------------
+
+. tab payment_method
+
+payment_meth |
+          od |      Freq.     Percent        Cum.
+-------------+-----------------------------------
+fb_promotion |        498        0.47        0.47
+     general |    103,278       97.89       98.36
+    giftcard |         58        0.05       98.41
+      mobile |      1,673        1.59      100.00
+-------------+-----------------------------------
+       Total |    105,507      100.00
+
+. tab payment_type
+
+payment_typ |
+          e |      Freq.     Percent        Cum.
+------------+-----------------------------------
+      offer |     13,839       13.12       13.12
+    regular |     91,668       86.88      100.00
+------------+-----------------------------------
+      Total |    105,507      100.00
+
+. predict r, resid
+
+. kdensity r, normal
+
+. estat hettest
+
+Breusch-Pagan / Cook-Weisberg test for heteroskedasticity 
+         Ho: Constant variance
+         Variables: fitted values of payment
+
+         chi2(1)      =756939.67
+         Prob > chi2  =   0.0000
+
+. estat vif
+
+    Variable |       VIF       1/VIF  
+-------------+----------------------
+crystalls_~t |      1.03    0.973126
+payment_type |      1.02    0.984394
+crystalls_~y |      1.01    0.986627
+payment_me~d |      1.00    0.999387
+-------------+----------------------
+    Mean VIF |      1.01
+
+. exit
+
+end of do-file
