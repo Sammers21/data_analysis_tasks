@@ -122,5 +122,7 @@ One-sample Kolmogorov-Smirnov test against theoretical distribution
            r |  6.443224
 ------------------------
 
+. kdensity r, normal
+
 . 
 end of do-file

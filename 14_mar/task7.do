@@ -14,4 +14,5 @@ egen r_s = sd(r)
 ksmirnov r = normprob((r-r_mu)/r_s)
 tabstat r, stats(range)
 kdensity r, normal
+histogram r
 exit
